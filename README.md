@@ -4,6 +4,8 @@ Tool to download and upload (using a tftp server) a running-config from/to a cis
 ## Compatability
 This program is written in Python 3 (3.7.2) and *should* work with any 3.x. I have not tested to verify this.
 
+This program must be run with administrative privileges (sudo) in order to create the tftp server that's built into the program.
+
 The binary executable in the repo is for Linux, made using [PyInstaller](http://www.pyinstaller.org/).
 
 The module [easysnmp](https://github.com/kamakazikamikaze/easysnmp) doesn't build on Windows due to the lack of Net-SNMP.
