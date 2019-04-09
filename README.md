@@ -2,7 +2,7 @@
 Tool to download and upload (using a tftp server) a running-config from/to a cisco switch using the snmp protocol.
 
 ## Compatability
-This program is written in Python 3 (3.7.2) and *should* work with any 3.x. I have not tested to verify this.
+This program is written in Python 3 (3.7.2) on Arch Linux and *should* work with any 3.x. I have not tested to verify this.
 
 This program must be run with administrative privileges (sudo) in order to create the tftp server that's built into the program. The Linux version uses the [easysnmp](https://github.com/kamakazikamikaze/easysnmp) module, and the Mac version uses MacOS' built in TFTP server.
 
