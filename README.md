@@ -1,4 +1,4 @@
-# cisco-config-tftp
+# cisco-config-tftp [![Build Status](https://travis-ci.com/strohmy86/cisco-config-tftp.svg?branch=master)](https://travis-ci.com/strohmy86/cisco-config-tftp)
 Tool to download and upload (using a tftp server) a running-config from/to a cisco switch using the snmp protocol.
 
 ## Compatability
