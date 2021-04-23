@@ -1,12 +1,12 @@
 language: python
 jobs:
   include:
-    - name: "Python 3.8 on Focal Linux"
+    - name: "Python 3.9 on Focal Linux"
       os: linux
       dist: focal
-      python: 3.8
+      python: 3.9
 install:
-  - pip3 install --upgrade pip  
+  - pip3 install --upgrade pip
   - pip3 install --upgrade pyinstaller
 script:
   - pyinstaller cisco-config-tftp.py --onefile
