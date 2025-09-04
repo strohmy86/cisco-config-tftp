@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Script to copy configs to and from Cisco switches"""
 
 # MIT License
 
@@ -35,6 +36,7 @@ import tftpy
 
 
 class Color:
+    """Class for various Colors"""
     PURPLE = "\033[95m"
     CYAN = "\033[96m"
     DARKCYAN = "\033[36m"
@@ -47,13 +49,15 @@ class Color:
     END = "\033[0m"
 
 
-class Msgs:  # Various repeated messages
+class Msgs:
+    """Various repeated messages"""
     cont = "Press ENTER to Continue..."
     err = "Invalid Option Selected!"
     choose = "Please Choose an Option:"
 
 
 def cred():
+    """Credits"""
     print(
         Color.DARKCYAN
         + "\n"
@@ -73,7 +77,8 @@ def cred():
     )
 
 
-def admin_check():  # Checks to see if current user is admin
+def admin_check():
+    """Checks to see if current user is admin"""
     try:
         is_admin = os.getuid() == 0
     except AttributeError:
@@ -88,7 +93,8 @@ def admin_check():  # Checks to see if current user is admin
         sys.exit(1)
 
 
-def main_menu():  # Main Menu
+def main_menu():
+    """Main Menu"""
     while True:
         print(Color.PURPLE + "\nMain Menu:\n" + Color.END)
         print("1)   Copy Config FROM Cisco Device TO a TFTP Server")
@@ -98,9 +104,9 @@ def main_menu():  # Main Menu
         if selection1 == "0":
             sys.exit()
         elif selection1 == "1":
-            toTftp()
+            to_tftp()
         elif selection1 == "2":
-            frTftp()
+            from_tftp()
         else:
             print(Color.RED + Msgs.err + Color.END)
             print("\n")
@@ -108,7 +114,8 @@ def main_menu():  # Main Menu
             input(Color.GREEN + Msgs.cont + Color.END)
 
 
-def toTftp():
+def to_tftp():
+    """Pulls config from Cisco device"""
     # OID List
     # Protocol = .1.3.6.1.4.1.9.9.96.1.1.1.1.2.<Random Number> i 1
     # Src File Type = .1.3.6.1.4.1.9.9.96.1.1.1.1.3.<Random Number> i 4
@@ -117,23 +124,23 @@ def toTftp():
     # DestFileName=.1.3.6.1.4.1.9.9.96.1.1.1.1.6.<Random Number> s <File Name>
     # Entry Row Stats = .1.3.6.1.4.1.9.9.96.1.1.1.1.14.<Random Number> i 4
     rand = str(random.randint(100, 999))
-    swAddr = input("What is the IP address of the switch?   ")
+    switch_addr = input("What is the IP address of the switch?   ")
     comm = input("What is the SNMP Community?   ")
     print(Color.YELLOW + "What is the IP address of the TFTP server?")
     print("Leave blank to use the built-in TFTP server. " + Color.END)
-    tftpAddr = str(input("IP address:   ") or "127.0.0.1")
-    fileName = input("Enter the filename (Optional: w/Path ):   ")
-    nameOnly = fileName.split("/")[-1]
-    if tftpAddr != "127.0.0.1":
+    tftp_addr = str(input("IP address:   ") or "127.0.0.1")
+    file_name = input("Enter the filename (Optional: w/Path ):   ")
+    name_only = file_name.split("/")[-1]
+    if tftp_addr != "127.0.0.1":
         tup = [
             (".1.3.6.1.4.1.9.9.96.1.1.1.1.2." + rand, "1", "i"),
             (".1.3.6.1.4.1.9.9.96.1.1.1.1.3." + rand, "4", "i"),
             (".1.3.6.1.4.1.9.9.96.1.1.1.1.4." + rand, "1", "i"),
-            (".1.3.6.1.4.1.9.9.96.1.1.1.1.5." + rand, tftpAddr, "a"),
-            (".1.3.6.1.4.1.9.9.96.1.1.1.1.6." + rand, fileName, "s"),
+            (".1.3.6.1.4.1.9.9.96.1.1.1.1.5." + rand, tftp_addr, "a"),
+            (".1.3.6.1.4.1.9.9.96.1.1.1.1.6." + rand, file_name, "s"),
             (".1.3.6.1.4.1.9.9.96.1.1.1.1.14." + rand, "4", "i"),
         ]
-        session = easysnmp.Session(hostname=swAddr, community=comm, version=2)
+        session = easysnmp.Session(hostname=switch_addr, community=comm, version=2)
         session.set_multiple(tup)
         time.sleep(2)
         input(Color.GREEN + Msgs.cont + Color.END)
@@ -148,7 +155,7 @@ def toTftp():
         server_thread.start()
         time.sleep(2)
         print("TFTP Server started in current working directory.")
-        ipAddr = [
+        ip_addr = [
             l
             for l in (
                 [
@@ -175,14 +182,14 @@ def toTftp():
             (".1.3.6.1.4.1.9.9.96.1.1.1.1.2." + rand, "1", "i"),
             (".1.3.6.1.4.1.9.9.96.1.1.1.1.3." + rand, "4", "i"),
             (".1.3.6.1.4.1.9.9.96.1.1.1.1.4." + rand, "1", "i"),
-            (".1.3.6.1.4.1.9.9.96.1.1.1.1.5." + rand, ipAddr, "a"),
-            (".1.3.6.1.4.1.9.9.96.1.1.1.1.6." + rand, nameOnly, "s"),
+            (".1.3.6.1.4.1.9.9.96.1.1.1.1.5." + rand, ip_addr, "a"),
+            (".1.3.6.1.4.1.9.9.96.1.1.1.1.6." + rand, name_only, "s"),
             (".1.3.6.1.4.1.9.9.96.1.1.1.1.14." + rand, "4", "i"),
         ]
-        session = easysnmp.Session(hostname=swAddr, community=comm, version=2)
+        session = easysnmp.Session(hostname=switch_addr, community=comm, version=2)
         session.set_multiple(tup)
         time.sleep(2)
-        success = os.path.isfile(os.getcwd() + "/" + nameOnly)
+        success = os.path.isfile(os.getcwd() + "/" + name_only)
         if success is True:
             print(Color.GREEN + "Success!" + Color.END)
             server.stop(now=False)
@@ -195,12 +202,13 @@ def toTftp():
             server_thread.join()
             yn = input("Would you like to try again? [Y/n]  ")
             if yn == "Y" or yn == "yes" or yn == "":
-                toTftp()
+                to_tftp()
             else:
                 main_menu()
 
 
-def frTftp():
+def from_tftp():
+    """Copy config to Cisco device"""
     # OID List
     # Protocol = .1.3.6.1.4.1.9.9.96.1.1.1.1.2.<Random Number> i 1
     # Src File Type = .1.3.6.1.4.1.9.9.96.1.1.1.1.3.<Random Number> i 1
@@ -209,34 +217,34 @@ def frTftp():
     # DestFileName=.1.3.6.1.4.1.9.9.96.1.1.1.1.6.<Random Number> s <File Name>
     # Entry Row Stats = .1.3.6.1.4.1.9.9.96.1.1.1.1.14.<Random Number> i 4
     rand = str(random.randint(100, 999))
-    swAddr = input("What is the IP address of the switch?   ")
+    switch_addr = input("What is the IP address of the switch?   ")
     comm = input("What is the SNMP Community?   ")
     print(Color.YELLOW + "What is the IP address of the TFTP server?")
     print(
         "Leave blank to use the built-in TFTP server and a local file. "
         + Color.END
     )
-    tftpAddr = str(input("IP address:   ") or "127.0.0.1")
-    if tftpAddr == "127.0.0.1":
+    tftp_addr = str(input("IP address:   ") or "127.0.0.1")
+    if tftp_addr == "127.0.0.1":
         print(
             Color.YELLOW
             + "The default file path is the current working "
             + "directory."
         )
         print("Your file MUST be inside or below this directory" + Color.END)
-    fileName = input(
+    file_name = input(
         "Enter the filename (w/path if below default " + "directory):   "
     )
-    if tftpAddr != "127.0.0.1":
+    if tftp_addr != "127.0.0.1":
         tup = [
             (".1.3.6.1.4.1.9.9.96.1.1.1.1.2." + rand, "1", "i"),
             (".1.3.6.1.4.1.9.9.96.1.1.1.1.3." + rand, "1", "i"),
             (".1.3.6.1.4.1.9.9.96.1.1.1.1.4." + rand, "4", "i"),
-            (".1.3.6.1.4.1.9.9.96.1.1.1.1.5." + rand, tftpAddr, "a"),
-            (".1.3.6.1.4.1.9.9.96.1.1.1.1.6." + rand, fileName, "s"),
+            (".1.3.6.1.4.1.9.9.96.1.1.1.1.5." + rand, tftp_addr, "a"),
+            (".1.3.6.1.4.1.9.9.96.1.1.1.1.6." + rand, file_name, "s"),
             (".1.3.6.1.4.1.9.9.96.1.1.1.1.14." + rand, "4", "i"),
         ]
-        session = easysnmp.Session(hostname=swAddr, community=comm, version=2)
+        session = easysnmp.Session(hostname=switch_addr, community=comm, version=2)
         session.set_multiple(tup)
         time.sleep(2)
         input(Color.GREEN + Msgs.cont + Color.END)
@@ -251,7 +259,7 @@ def frTftp():
         server_thread.start()
         time.sleep(2)
         print("TFTP Server started in current working directory.")
-        ipAddr = [
+        ip_addr = [
             l
             for l in (
                 [
@@ -278,11 +286,11 @@ def frTftp():
             (".1.3.6.1.4.1.9.9.96.1.1.1.1.2." + rand, "1", "i"),
             (".1.3.6.1.4.1.9.9.96.1.1.1.1.3." + rand, "1", "i"),
             (".1.3.6.1.4.1.9.9.96.1.1.1.1.4." + rand, "4", "i"),
-            (".1.3.6.1.4.1.9.9.96.1.1.1.1.5." + rand, ipAddr, "a"),
-            (".1.3.6.1.4.1.9.9.96.1.1.1.1.6." + rand, fileName, "s"),
+            (".1.3.6.1.4.1.9.9.96.1.1.1.1.5." + rand, ip_addr, "a"),
+            (".1.3.6.1.4.1.9.9.96.1.1.1.1.6." + rand, file_name, "s"),
             (".1.3.6.1.4.1.9.9.96.1.1.1.1.14." + rand, "4", "i"),
         ]
-        session = easysnmp.Session(hostname=swAddr, community=comm, version=2)
+        session = easysnmp.Session(hostname=switch_addr, community=comm, version=2)
         session.set_multiple(tup)
         time.sleep(10)
         server.stop(now=False)
